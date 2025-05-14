@@ -1,0 +1,6 @@
+functions-framework==3.*
+pandas
+numpy
+google-cloud-storage
+pandas-gbq
+google-cloud-bigquery
