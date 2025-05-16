@@ -15,20 +15,20 @@ def main(request):
     request_args = request.args 
     
     bucket = "spc_financials"
-    name = "SPC_Monzo.csv"
+    name = "SPC_psuk.csv"
 
-    df_monzo = read_monzo(bucket, name)         #Read monzo file
-    print(df_monzo.head().to_string())
+    df_psuk = read_psuk(bucket, name)         #Read psuk file
+    print(df_psuk.head().to_string())
 
-    cost_df = cost(df_monzo)
+    cost_df = cost(df_psuk)
     print(cost_df.head().to_string())
-    table_id = 'spc-sandbox-453019.financials.spc-cost-monzo'
+    table_id = 'spc-sandbox-453019.financials.spc-cost-psuk'
     cost_df.to_gbq(table_id, if_exists='replace')
 
     return 'Hello World!'
 
 
-def read_monzo(bucket_name, source_blob_name):
+def read_psuk(bucket_name, source_blob_name):
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(source_blob_name)
@@ -68,23 +68,23 @@ def read_monzo(bucket_name, source_blob_name):
 
     return new_df
 
-def cost(monzo_df):
+def cost(psuk_df):
 
-    cost_df = monzo_df[monzo_df['Type'] == "Cost"]
+    cost_df = psuk_df[psuk_df['Type'] == "Cost"]
     cost_df = cost_df.reset_index(drop=True)
 
     client = bigquery.Client()
     ex_query = """
     SELECT Substring 
     FROM `spc-sandbox-453019.financials.config-ops-exclude` 
-    WHERE File = 'monzo' AND Type = 'cost'
+    WHERE File = 'psuk' AND Type = 'cost'
     """
     ex_df = client.query(ex_query).to_dataframe()
 
     rc_query = """
     SELECT Substring, Category 
     FROM `spc-sandbox-453019.financials.config-cost-categories`
-    WHERE File = 'monzo'"""
+    WHERE File = 'psuk'"""
     rc_df = client.query(rc_query).to_dataframe()
 
     return updateci(rc_df, ex_df, cost_df)
