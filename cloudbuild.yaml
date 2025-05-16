@@ -3,7 +3,7 @@ steps:
     args:
       - functions
       - deploy
-      - spc-monzo               # Name of your function
+      - spc-psuk                # Name of your function
       - --runtime=python311     # Specify your Python version (e.g., python310 or python311)
       - --trigger-http
       - --entry-point=main
